@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+
 @RestController
 @RequestMapping("/api/boards/{boardId}/lists")
 public class ListController {
@@ -15,7 +17,7 @@ public class ListController {
 
     @GetMapping
     public ResponseEntity<java.util.List<List>> getAllLists(@PathVariable Long boardId, @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(listService.getAllLists(boardId, token));
+        return ResponseEntity.ok(Collections.singletonList(listService.getAllLists(boardId, token)));
     }
 
     @PostMapping

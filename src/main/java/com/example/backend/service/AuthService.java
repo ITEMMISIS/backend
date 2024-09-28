@@ -6,6 +6,8 @@ import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -15,6 +17,8 @@ public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // Метод регистрации пользователя
     public ResponseEntity<?> registerUser(UserRegistrationDto registrationDto) {
@@ -27,8 +31,8 @@ public class AuthService {
     // Метод входа пользователя
     public ResponseEntity<?> loginUser(LoginDto loginDto) {
         User user = userRepository.findByEmail(loginDto.getEmail());
-        if (user == null || !user.getPasswordHash().equals(loginDto.getPassword())) {
-            throw new javax.naming.AuthenticationException("Invalid email or password");
+        if (user == null || !passwordEncoder.matches(loginDto.getPassword(), user.getPasswordHash())) {
+            throw new BadCredentialsException("Invalid email or password");
         }
         String jwtToken = generateJwtToken(user); // Генерация JWT токена
         return ResponseEntity.ok(Collections.singletonMap("token", jwtToken));
